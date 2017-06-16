@@ -4,6 +4,8 @@ cmake_minimum_required(VERSION 3.1.0 FATAL_ERROR)
 #	message(FATAL_ERROR "Cannot find googletest directory.")
 #endif()
 
+add_definitions(-DCOMPILER_MSVC -DSTL_MSVC -D_USE_MATH_DEFINES=1 -D_CRT_SECURE_NO_WARNINGS -DNOMINMAX)
+set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /J")
 set(GOOGLETEST_DIR "NOT SET" CACHE FILEPATH "path to googletest")
 set(S2_LIBDIR "NOT SET" CACHE FILEPATH "location of S2")
 set(OPENSSL_LIBDIR "NOT SET" CACHE FILEPATH "location of OPENSSL libs")
