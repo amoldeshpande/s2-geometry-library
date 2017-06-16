@@ -135,6 +135,7 @@ template<> struct hash<const string> {
 #endif  // __GNUC__
 
 // MSVC's STL requires an ever-so slightly different decl
+#if _MSC_VER < 1900
 #if defined STL_MSVC
 template<> struct hash<char const*> : PortableHashBase {
   size_t operator()(char const* const k) const {
@@ -155,6 +156,7 @@ template<> struct hash<string> : PortableHashBase {
     return a < b;
   }
 };
+#endif
 
 #endif
 
@@ -186,7 +188,7 @@ struct simple_insert_iterator {
 // SplitStringToIterator{Using|AllowEmpty}().
 template <typename T>
 struct simple_hash_map_iterator {
-  typedef hash_map<T, T> hashmap;
+  typedef unordered_map<T, T> hashmap;
   hashmap* t;
   bool even;
   typename hashmap::iterator curr;
@@ -271,8 +273,8 @@ void SplitStringAllowEmpty(const string& full, const char* delim,
 }
 
 void SplitStringToHashsetAllowEmpty(const string& full, const char* delim,
-                                    hash_set<string>* result) {
-  simple_insert_iterator<hash_set<string> > it(result);
+                                    unordered_set<string>* result) {
+  simple_insert_iterator<unordered_set<string> > it(result);
   SplitStringToIteratorAllowEmpty(full, delim, 0, it);
 }
 
@@ -283,7 +285,7 @@ void SplitStringToSetAllowEmpty(const string& full, const char* delim,
 }
 
 void SplitStringToHashmapAllowEmpty(const string& full, const char* delim,
-                                    hash_map<string, string>* result) {
+                                    unordered_map<string, string>* result) {
   simple_hash_map_iterator<string> it(result);
   SplitStringToIteratorAllowEmpty(full, delim, 0, it);
 }
@@ -377,8 +379,8 @@ void SplitStringUsing(const string& full,
 }
 
 void SplitStringToHashsetUsing(const string& full, const char* delim,
-                               hash_set<string>* result) {
-  simple_insert_iterator<hash_set<string> > it(result);
+                               unordered_set<string>* result) {
+  simple_insert_iterator<unordered_set<string> > it(result);
   SplitStringToIteratorUsing(full, delim, it);
 }
 
@@ -389,7 +391,7 @@ void SplitStringToSetUsing(const string& full, const char* delim,
 }
 
 void SplitStringToHashmapUsing(const string& full, const char* delim,
-                               hash_map<string, string>* result) {
+                               unordered_map<string, string>* result) {
   simple_hash_map_iterator<string> it(result);
   SplitStringToIteratorUsing(full, delim, it);
 }

@@ -216,7 +216,7 @@ inline void Encoder::putn(const void* src, int n) {
 
 inline void Encoder::putcn(const void* src, int c, int n) {
   unsigned char *old = buf_;
-  buf_ = static_cast<unsigned char *>(memccpy(buf_, src, c, n));
+  buf_ = static_cast<unsigned char *>(_memccpy(buf_, src, c, n));
   if (buf_ == NULL)
     buf_ = old + n;
 }
@@ -277,7 +277,7 @@ inline void Decoder::getn(void* dst, int n) {
 
 inline void Decoder::getcn(void* dst, int c, int n) {
   void *ptr;
-  ptr = memccpy(dst, buf_, c, n);
+  ptr = _memccpy(dst, buf_, c, n);
   if (ptr == NULL)
     buf_ = buf_ + n;
   else

@@ -2,7 +2,7 @@
 
 #include "s2cellid.h"
 
-#include <pthread.h>
+#include <mutex>
 
 #include <algorithm>
 using std::min;
@@ -60,6 +60,7 @@ static int const kInvertMask = 0x02;
 static uint16 lookup_pos[1 << (2 * kLookupBits + 2)];
 static uint16 lookup_ij[1 << (2 * kLookupBits + 2)];
 
+std::once_flag onceFlag;
 static void InitLookupCell(int level, int i, int j, int orig_orientation,
                            int pos, int orientation) {
   if (level == kLookupBits) {
@@ -90,9 +91,8 @@ static void Init() {
   InitLookupCell(0, 0, 0, kSwapMask|kInvertMask, 0, kSwapMask|kInvertMask);
 }
 
-static pthread_once_t init_once = PTHREAD_ONCE_INIT;
 inline static void MaybeInit() {
-  pthread_once(&init_once, Init);
+    std::call_once(onceFlag, Init);
 }
 
 int S2CellId::level() const {
@@ -204,6 +204,7 @@ inline int S2CellId::STtoIJ(double s) {
 
 S2CellId S2CellId::FromFaceIJ(int face, int i, int j) {
   // Initialization if not done yet
+#if !_MSC_VER
   MaybeInit();
 
   // Optimization notes:
@@ -248,6 +249,21 @@ S2CellId S2CellId::FromFaceIJ(int face, int i, int j) {
 #undef GET_BITS
 
   return S2CellId(((static_cast<uint64>(n[1]) << 32) + n[0]) * 2 + 1);
+#endif
+  uint64_t n = (uint64_t)face << (kPosBits - 1);
+
+  uint64_t bits = face & kSwapMask;
+  for (int k = 7; k >= 0; k--)
+  {
+      const int mask = (1 << kLookupBits) - 1;
+      bits += ((i >> k*kLookupBits) & mask) << (kLookupBits + 2);
+      bits += ((j >> k*kLookupBits) & mask) << 2;
+      bits = lookup_pos[bits];
+      n |= (uint64_t)(bits >> 2) << (k * 2 * kLookupBits);
+      bits &= (kSwapMask | kInvertMask);
+  }
+  return S2CellId(n * 2 + 1);
+
 }
 
 S2CellId S2CellId::FromPoint(S2Point const& p) {

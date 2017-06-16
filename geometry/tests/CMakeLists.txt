@@ -1,24 +1,29 @@
 cmake_minimum_required(VERSION 3.1.0 FATAL_ERROR)
 
-if (NOT EXISTS "googletest/googletest/CMakeLists.txt")
-	message(FATAL_ERROR "Cannot find googletest directory.")
-endif()
+#if (NOT EXISTS "googletest/googletest/CMakeLists.txt")
+#	message(FATAL_ERROR "Cannot find googletest directory.")
+#endif()
+
+set(GOOGLETEST_DIR "NOT SET" CACHE FILEPATH "path to googletest")
+set(S2_LIBDIR "NOT SET" CACHE FILEPATH "location of S2")
+set(OPENSSL_LIBDIR "NOT SET" CACHE FILEPATH "location of OPENSSL libs")
+link_directories(${S2_LIBDIR} ${OPENSSL_LIBDIR})
 
 include_directories(
 	../s2
 	..
-	googletest/googletest
-	googletest/googletest/include
+	${GOOGLETEST_DIR}
+	${GOOGLETEST_DIR}/include
 )
 
 add_library(gtest STATIC
-	googletest/googletest/src/gtest-all.cc
+	${GOOGLETEST_DIR}/src/gtest-all.cc
 )
-target_link_libraries(gtest pthread)
+target_link_libraries(gtest)
 
-add_library(gtest_main STATIC	googletest/googletest/src/gtest_main.cc)
+add_library(gtest_main STATIC	${GOOGLETEST_DIR}/src/gtest_main.cc)
 
-target_link_libraries(gtest_main gtest pthread)
+target_link_libraries(gtest_main gtest)
 
 set(tests_files
 	r1interval_test.cc
@@ -50,7 +55,7 @@ set(tests_files
 add_executable(tests ${tests_files})
 set_property(TARGET tests PROPERTY CXX_STANDARD 11)
 set_property(TARGET tests PROPERTY CXX_STANDARD_REQUIRED ON)
-target_link_libraries(tests s2 s2util s2cellid gtest_main pthread)
+target_link_libraries(tests s2 s2util s2cellid gtest_main libeay32)
 
 add_custom_target(check
 	COMMAND tests

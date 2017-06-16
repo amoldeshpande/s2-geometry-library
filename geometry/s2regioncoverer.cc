@@ -2,8 +2,7 @@
 
 #include "s2regioncoverer.h"
 
-#include <pthread.h>
-
+#include <mutex>
 #include <algorithm>
 using std::min;
 using std::max;
@@ -15,11 +14,11 @@ using std::less;
 
 
 #if defined __GNUC__ || defined __APPLE__
-#include <ext/hash_set>
+#include <ext/unordered_set>
 #else
-#include <hash_set>
+#include <unordered_set>
 #endif
-using __gnu_cxx::hash_set;
+using std::unordered_set;
 
 #include <queue>
 using std::priority_queue;
@@ -55,9 +54,9 @@ void Init() {
   }
 }
 
-static pthread_once_t init_once = PTHREAD_ONCE_INIT;
+static std::once_flag init_once;
 inline static void MaybeInit() {
-  pthread_once(&init_once, Init);
+  std::call_once(init_once, Init);
 }
 
 S2RegionCoverer::S2RegionCoverer() :
@@ -327,7 +326,7 @@ void S2RegionCoverer::GetInteriorCellUnion(S2Region const& region,
 
 void S2RegionCoverer::FloodFill(
     S2Region const& region, S2CellId const& start, vector<S2CellId>* output) {
-  hash_set<S2CellId> all;
+  unordered_set<S2CellId> all;
   vector<S2CellId> frontier;
   output->clear();
   all.insert(start);

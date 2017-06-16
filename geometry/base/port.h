@@ -171,10 +171,12 @@ const char PATH_SEPARATOR = '/';
 // If va_list uses the single-element-array trick, you will probably get
 // a compiler error here.
 //
+#if _MSC_VER < 1900
 #include <stdarg.h>
 inline void va_copy(va_list& a, va_list& b) {
   a = b;
 }
+#endif
 
 // Nor does it have uid_t
 typedef int uid_t;
@@ -691,6 +693,8 @@ extern inline void prefetch(const char *x) {}
 #pragma warning(disable : 4355 )
 // Truncating from double to float is ok
 #pragma warning(disable : 4305 )
+#pragma warning(disable : 4146 ) // unary minus on unsigned
+#pragma warning(disable : 4267 ) // size_t to in
 
 #include <winsock2.h>
 #include <assert.h>
@@ -769,6 +773,7 @@ inline void aligned_free(void *aligned_memory) {
 }
 
 // ----- BEGIN VC++ STUBS & FAKE DEFINITIONS ---------------------------------
+#if _MSC_VER < 1900
 
 // See http://en.wikipedia.org/wiki/IEEE_754 for details of
 // floating point format.
@@ -887,11 +892,12 @@ typedef unsigned short u_int16_t;
 typedef short int16_t;
 
 // ----- END VC++ STUBS & FAKE DEFINITIONS ----------------------------------
+#endif // MSC_VER < 1900
 
 #endif  // COMPILER_MSVC
 
 #ifdef STL_MSVC  // not always the same as COMPILER_MSVC
-#include "base/port_hash.h"
+//#include "base/port_hash.h"
 #else
 struct PortableHashBase { };
 #endif

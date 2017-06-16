@@ -136,14 +136,14 @@ set(s2includes_util_math
 	util/math/vector4-inl.h
 )
 
-add_library(s2util SHARED ${s2util_files})
+add_library(s2util STATIC ${s2util_files})
 target_link_libraries(s2util ${OPENSSL_LIBRARIES})
 
-add_library(s2cellid SHARED ${s2cellid_files})
+add_library(s2cellid STATIC ${s2cellid_files})
 target_link_libraries(s2cellid s2util)
 
-add_library(s2 SHARED ${s2_files})
-target_link_libraries(s2 s2cellid s2util ${OPENSSL_LIBRARIES} pthread)
+add_library(s2 STATIC ${s2_files})
+target_link_libraries(s2 s2cellid s2util ${OPENSSL_LIBRARIES} )
 
 install(TARGETS s2util s2cellid s2
 	LIBRARY DESTINATION lib

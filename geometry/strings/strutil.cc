@@ -8,7 +8,11 @@
 #include <errno.h>
 #include <float.h>          // for DBL_DIG and FLT_DIG
 #include <math.h>           // for HUGE_VAL
+#if !_MSC_VER
 #include <pthread.h>        // for gmtime_r (on Windows)
+#else
+#define gmtime_r(a,b) gmtime_s((b),(a))
+#endif
 #include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>

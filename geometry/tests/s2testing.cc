@@ -1,7 +1,9 @@
 // Copyright 2005 Google Inc. All Rights Reserved.
 
 #include <stdlib.h>
+#if !_MSC_VER
 #include <sys/resource.h>   // for rusage, RUSAGE_SELF
+#endif
 #include <limits.h>
 
 #include <vector>
@@ -306,7 +308,11 @@ void S2Testing::CheckCovering(S2Region const& region,
 }
 
 double S2Testing::GetCpuTime() {
+#if !_MSC_VER
   struct rusage ru;
   CHECK_EQ(getrusage(RUSAGE_SELF, &ru), 0);
   return ru.ru_utime.tv_sec + ru.ru_utime.tv_usec / 1e6;
+#else
+    return GetTickCount() / 1000;
+#endif
 }

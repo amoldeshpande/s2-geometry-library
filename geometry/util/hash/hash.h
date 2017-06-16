@@ -24,13 +24,12 @@
 #include <string>
 using std::string;
 
-#include <ext/hash_map>
-using __gnu_cxx::hash;
-using __gnu_cxx::hash_map;
-#include <ext/hash_set>
-using __gnu_cxx::hash;
-using __gnu_cxx::hash_set;
-using __gnu_cxx::hash_multiset;
+#include <unordered_map>
+#include <unordered_set>
+using std::hash;
+using std::unordered_map;
+using std::unordered_set;
+using std::unordered_multiset;
 
 #include "base/integral_types.h"
 #include "base/port.h"
@@ -93,8 +92,8 @@ inline size_t HashTo32(const char* s, size_t len) {
 
 // --------------- STL hashers -------------------------------------------------
 
-#include <ext/hash_set>
-namespace __gnu_cxx {
+#include <unordered_set>
+namespace std {
 
 
 // STLport and MSVC 10.0 above already define these.
@@ -119,9 +118,11 @@ template<> struct hash<uint64> {
 
 #endif  // !defined(_STLP_LONG_LONG) && !(defined(_MSC_VER) && _MSC_VER >= 1600)
 
+#if _MSC_VER < 1900
 template<> struct hash<bool> {
   size_t operator()(bool x) const { return static_cast<size_t>(x); }
 };
+#endif
 
 #if defined(__GNUC__)
 // Use our nice hash function for strings
